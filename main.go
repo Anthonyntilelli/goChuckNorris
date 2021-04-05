@@ -1,44 +1,99 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
-
-	responce, err := getRandomFact()
+	fact, err := getRandomFactbytext("potato")
 	if err != nil {
 		fmt.Println("ERROR")
 		fmt.Println(err)
 	} else {
-		fmt.Println(string(responce))
+		fmt.Println(fact)
 	}
 }
 
 const FactURL string = "https://api.chucknorris.io/"
 
-func getRandomFact() ([]byte, error) {
-	return getAPI(FactURL + "/jokes/random")
+type ChuckFact struct {
+	Categories []string
+	Created    string `json:"created_at"`
+	IconUrl    string `json:"icon_url"`
+	Id         string
+	Updated    string `json:"updated_at"`
+	Url        string
+	Value      string
 }
 
-func getCategorieslist() ([]byte, error) {
-	return getAPI(FactURL + "jokes/categories")
+type chuckFactList struct {
+	Total  int
+	Result []ChuckFact
 }
 
-func getRandomFactByCategory(category string) ([]byte, error) {
-	return getAPI(FactURL + "/jokes/random?category=" + category)
-}
+type categoriesList []string
 
-func getJokesbytext(text string) ([]byte, error) {
-	if strings.Contains(text, " ") {
-		return nil, fmt.Errorf("text must be one word")
+func getRandomFact() (ChuckFact, error) {
+	var fact ChuckFact
+	responce, err := getAPI(FactURL + "/jokes/random")
+	if err != nil {
+		return fact, err
 	}
 
-	return getAPI(FactURL + "jokes/search?query=" + text)
+	err = json.Unmarshal(responce, &fact)
+	return fact, err
+}
+
+func getCategorieslist() (categoriesList, error) {
+	responceList, err := getAPI(FactURL + "jokes/categories")
+	if err != nil {
+		return nil, err
+	}
+	var categories categoriesList
+	err = json.Unmarshal(responceList, &categories)
+	return categories, err
+}
+
+func getRandomFactByCategory(category string) (ChuckFact, error) {
+	var fact ChuckFact
+	responce, err := getAPI(FactURL + "/jokes/random?category=" + category)
+	if err != nil {
+		return fact, err
+	}
+
+	err = json.Unmarshal(responce, &fact)
+	return fact, err
+}
+
+func getRandomFactbytext(searhTerm string) (ChuckFact, error) {
+	var factList chuckFactList
+	var fact ChuckFact
+
+	if strings.Contains(searhTerm, " ") {
+		return fact, fmt.Errorf("search term must be one word")
+	}
+
+	responce, err := getAPI(FactURL + "jokes/search?query=" + searhTerm)
+	if err != nil {
+		return fact, err
+	}
+	err = json.Unmarshal(responce, &factList)
+	if err != nil {
+		return fact, err
+	}
+	// Pick one fact from list randomly
+	rand.Seed(time.Now().UnixNano())
+	min, max := 0, len(factList.Result)-1
+	pick := min + rand.Intn(max-min)
+	fact = factList.Result[pick]
+	return fact, err
 }
 
 func getAPI(fullUrl string) ([]byte, error) {
@@ -46,8 +101,8 @@ func getAPI(fullUrl string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if (err == nil) && (resp.StatusCode != 200) {
-		return nil, fmt.Errorf("Return status code is" + strconv.Itoa(resp.StatusCode))
+	if (err == nil) && (resp.StatusCode != http.StatusOK) {
+		return nil, fmt.Errorf("Return status code is: " + strconv.Itoa(resp.StatusCode))
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
