@@ -11,24 +11,20 @@ import (
 	"time"
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 type CategoriesList []string
 
 type ChuckFact struct {
 	Categories []string
-	Created    string `json:"created_at"`
-	IconUrl    string `json:"icon_url"`
 	Id         string
-	Updated    string `json:"updated_at"`
-	Url        string
 	Value      string
-}
-
-var EmergencyFacts []string = []string{
-	"Chuck Norris counted to infinity. Twice.",
-	"Chuck Norris can strangle you with a cordless phone.",
-	"Chuck Norris once went to mars. Thats why there are no signs of life.",
-	"Chuck Norris is the reason Waldo is hiding.",
-	"Chuck Norris will never have a heart attack... even a heart isnt foolish enough to attack Chuck Norris.",
+	// Created    string `json:"created_at"`
+	// IconUrl    string `json:"icon_url"`
+	// Updated    string `json:"updated_at"`
+	// Url        string
 }
 
 type chuckFactList struct {
@@ -87,11 +83,31 @@ func RandomFactbytext(searhTerm string) (ChuckFact, error) {
 		return fact, err
 	}
 	// Pick one fact from list randomly
-	rand.Seed(time.Now().UnixNano())
 	min, max := 0, len(factList.Result)-1
 	pick := min + rand.Intn(max-min)
 	fact = factList.Result[pick]
 	return fact, err
+}
+
+func EmergencyFact() ChuckFact {
+	emergencyFacts := [...]string{
+		"Chuck Norris counted to infinity. Twice.",
+		"Chuck Norris can strangle you with a cordless phone.",
+		"Chuck Norris once went to mars. Thats why there are no signs of life.",
+		"Chuck Norris is the reason Waldo is hiding.",
+		"Chuck Norris will never have a heart attack... even a heart isnt foolish enough to attack Chuck Norris.",
+	}
+
+	// Pick one fact from list randomly
+	min, max := 0, len(emergencyFacts)-1
+	pick := min + rand.Intn(max-min)
+	value := emergencyFacts[pick]
+
+	return ChuckFact{
+		Categories: nil,
+		Id:         "{Emergency}",
+		Value:      value,
+	}
 }
 
 func getAPI(fullUrl string) ([]byte, error) {
