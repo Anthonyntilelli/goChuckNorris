@@ -40,6 +40,14 @@ type chuckFactList struct {
 
 type categoriesList []string
 
+var EmergencyFacts []string = []string{
+	"Chuck Norris counted to infinity. Twice.",
+	"Chuck Norris can strangle you with a cordless phone.",
+	"Chuck Norris once went to mars. Thats why there are no signs of life.",
+	"Chuck Norris is the reason Waldo is hiding.",
+	"Chuck Norris will never have a heart attack... even a heart isnt foolish enough to attack Chuck Norris.",
+}
+
 func getRandomFact() (ChuckFact, error) {
 	var fact ChuckFact
 	responce, err := getAPI(FactURL + "/jokes/random")
