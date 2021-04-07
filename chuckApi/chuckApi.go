@@ -82,6 +82,9 @@ func RandomFactbytext(searhTerm string) (ChuckFact, error) {
 	if err != nil {
 		return fact, err
 	}
+	if len(factList.Result) == 0 {
+		return fact, fmt.Errorf("no results for provided searhTerm")
+	}
 	// Pick one fact from list randomly
 	min, max := 0, len(factList.Result)-1
 	pick := min + rand.Intn(max-min)
