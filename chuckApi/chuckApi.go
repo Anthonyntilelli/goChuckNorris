@@ -17,8 +17,6 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type CategoriesList []string
-
 // ChuckFact contains the fact with some metadata convered from API Json reponse.
 // If more metadate is required, uncomment the extra entries.
 // However, `Categories`, `Id`, and `Value` are required.
@@ -52,12 +50,12 @@ func RandomFact() (ChuckFact, error) {
 	return fact, err
 }
 
-func Categorieslist() (CategoriesList, error) {
+func CategoriesList() ([]string, error) {
 	responceList, err := getAPI(factURL + "jokes/categories")
 	if err != nil {
 		return nil, err
 	}
-	var categories CategoriesList
+	var categories []string
 	err = json.Unmarshal(responceList, &categories)
 	return categories, err
 }

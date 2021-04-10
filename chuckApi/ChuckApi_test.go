@@ -22,12 +22,12 @@ func TestRandomFact(t *testing.T) {
 	}
 }
 
-func TestCategorieslist(t *testing.T) {
-	result1, err1 := Categorieslist()
+func TestCategoriesList(t *testing.T) {
+	result1, err1 := CategoriesList()
 	if err1 != nil {
 		t.Errorf("Error during call1 (%v)", err1)
 	}
-	result2, err2 := Categorieslist()
+	result2, err2 := CategoriesList()
 	if err2 != nil {
 		t.Errorf("Error during call2 (%v)", err2)
 	}
@@ -44,7 +44,7 @@ func TestCategorieslist(t *testing.T) {
 }
 
 func TestRandomFactByCategory(t *testing.T) {
-	categories, cErr := Categorieslist()
+	categories, cErr := CategoriesList()
 	if cErr != nil {
 		t.Errorf("Error during category call (%v)", cErr)
 	} else {
