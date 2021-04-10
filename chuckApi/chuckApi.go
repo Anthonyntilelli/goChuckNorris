@@ -1,3 +1,5 @@
+// Package chuckApi makes https calls to the Chuck Norris Api to get a facts.
+// Each call is done once, retries need be handles outside the package.
 package chuckApi
 
 import (
@@ -17,6 +19,9 @@ func init() {
 
 type CategoriesList []string
 
+// ChuckFact contains the fact with some metadata convered from API Json reponse.
+// If more metadate is required, uncomment the extra entries.
+// However, `Categories`, `Id`, and `Value` are required.
 type ChuckFact struct {
 	Categories []string
 	Id         string
@@ -32,6 +37,8 @@ type chuckFactList struct {
 	Result []ChuckFact
 }
 
+// factURL points to api end point.
+// Must start with `https` and end with a `/`
 const factURL string = "https://api.chucknorris.io/"
 
 func RandomFact() (ChuckFact, error) {
@@ -55,6 +62,7 @@ func Categorieslist() (CategoriesList, error) {
 	return categories, err
 }
 
+// RandomFactByCategory does not check locally, relies on api for errors
 func RandomFactByCategory(category string) (ChuckFact, error) {
 	var fact ChuckFact
 	responce, err := getAPI(factURL + "/jokes/random?category=" + category)
@@ -66,6 +74,9 @@ func RandomFactByCategory(category string) (ChuckFact, error) {
 	return fact, err
 }
 
+// RandomFactbytext looks for facts based on search term and returns one randomly from the list.
+// searchTerm MUST be one word
+// If no facts can be found for a given search term, an error is returned.
 func RandomFactbytext(searhTerm string) (ChuckFact, error) {
 	var factList chuckFactList
 	var fact ChuckFact
@@ -92,6 +103,7 @@ func RandomFactbytext(searhTerm string) (ChuckFact, error) {
 	return fact, err
 }
 
+// EmergencyFact will return a valid ChuckFact from a small local list in the function.
 func EmergencyFact() ChuckFact {
 	emergencyFacts := [...]string{
 		"Chuck Norris counted to infinity. Twice.",
@@ -111,6 +123,11 @@ func EmergencyFact() ChuckFact {
 		Id:         "{Emergency}",
 		Value:      value,
 	}
+}
+
+// Valid only check ID and Value.
+func (c ChuckFact) Valid() bool {
+	return c.Id != "" && c.Value != ""
 }
 
 func getAPI(fullUrl string) ([]byte, error) {

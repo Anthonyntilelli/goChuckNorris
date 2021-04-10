@@ -14,8 +14,8 @@ func TestRandomFact(t *testing.T) {
 	if err2 != nil {
 		t.Errorf("Error during call2 (%v)", err2)
 	}
-	if result1.Id == "" || result2.Id == "" {
-		t.Error("Invalid result1 or result2")
+	if !result1.Valid() || !result2.Valid() {
+		t.Error("result1 or result 2 are not valid")
 	} else if result1.Id == result2.Id {
 		// Test ID, as jokes may have been re-submitted to site.
 		t.Error("result 1 and result 2 Id should not be the same.")
@@ -53,15 +53,17 @@ func TestRandomFactByCategory(t *testing.T) {
 			t.Errorf("Error during call2 (%v)", err1)
 		}
 		// Invalid category
-		_, err2 := RandomFactByCategory("kdjfslkfjwpoiej")
+		invalidResult, err2 := RandomFactByCategory("kdjfslkfjwpoiej")
 		// Error expected on invalid provided category
 		if err2 == nil {
 			t.Errorf("Error is expected with invalid Category")
 		}
-		if result1.Id == "" {
-			t.Error("results1 has an invalid Id")
+		if !result1.Valid() {
+			t.Error("result1 is not valid")
 		}
-
+		if invalidResult.Valid() {
+			t.Error("invalidResult is valid when it should not be")
+		}
 	}
 }
 
@@ -95,7 +97,14 @@ func TestEmergencyFact(t *testing.T) {
 	if result.Categories != nil {
 		t.Errorf("Emergency fact categories should be empty instead `%v`", result.Categories)
 	}
-	if result.Value == "" {
-		t.Error("Emergency fact value should not be empty")
+	if !result.Valid() {
+		t.Error("result should valid")
+	}
+}
+
+func TestValid(t *testing.T) {
+	var c ChuckFact
+	if c.Valid() {
+		t.Error("Blank ChuckFact should not be valid")
 	}
 }
