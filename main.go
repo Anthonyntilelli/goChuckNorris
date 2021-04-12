@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-)
 
-// "github.com/Anthonyntilelli/goChuckNorris/chuckApi"
+	"github.com/Anthonyntilelli/goChuckNorris/chuckApi"
+)
 
 func main() {
 	// fact, err := chuckApi.RandomFact()
@@ -39,13 +39,24 @@ func main() {
 
 	switch selection {
 	case "s":
-		fmt.Println("search Term")
+		fact, err := chuckApi.RandomFactbytext(*searchTerm)
+		outputFact(fact, err)
 	case "k":
-		fmt.Println("Category Search")
+		fact, err := chuckApi.RandomFactByCategory(*category)
+		outputFact(fact, err)
 	case "c":
-		fmt.Println("List categories")
+		categories, err := chuckApi.CategoriesList()
+		if err != nil {
+			fmt.Println("ERROR: ", err)
+			os.Exit(3)
+		}
+		println("Categories availble:")
+		for _, cat := range categories {
+			fmt.Println("  - ", cat)
+		}
 	case "r":
-		fmt.Println("random")
+		fact, err := chuckApi.RandomFact()
+		outputFact(fact, err)
 	default:
 		if len(selection) == 0 {
 			fmt.Fprintln(os.Stderr, "Error: A flag must be selected")
@@ -54,5 +65,15 @@ func main() {
 		}
 		flag.Usage()
 		os.Exit(2)
+	}
+}
+
+func outputFact(fact chuckApi.ChuckFact, err error) {
+	if err != nil {
+		fmt.Println("ERROR: ", err)
+		fmt.Println("Emergeny Fact: ", chuckApi.EmergencyFact().Value)
+		os.Exit(3)
+	} else {
+		fmt.Println(fact.Value)
 	}
 }
