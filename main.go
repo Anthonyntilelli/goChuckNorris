@@ -16,35 +16,43 @@ func main() {
 	// } else {
 	// 	fmt.Println(fact)
 	// }
-	var searchTerm, category string
-	var showCategories, random bool
-	set := 0
+	var selection string
 
-	flag.StringVar(&searchTerm, "s", "", "Get a fact based on search Term [choose only one flag]")
-	flag.StringVar(&category, "k", "", "Get a fact based on category [choose only one flag]")
-	flag.BoolVar(&showCategories, "c", false, "Shows available categories [choose only one flag]")
-	flag.BoolVar(&random, "r", false, "Shows a random fact [choose only one flag]")
+	searchTerm := flag.String("s", "", "Get a fact based on search Term [choose only one flag]")
+	category := flag.String("k", "", "Get a fact based on category [choose only one flag]")
+	showCategories := flag.Bool("c", false, "Shows available categories [choose only one flag]")
+	random := flag.Bool("r", false, "Shows a random fact [choose only one flag]")
 	flag.Parse() // searchTerm, category, showCategories, random variables are not set till after parse
 
-	if searchTerm != "" {
-		set++
+	if *searchTerm != "" {
+		selection += "s"
 	}
-	if category != "" {
-		set++
+	if *category != "" {
+		selection += "k"
 	}
-	if showCategories {
-		set++
+	if *showCategories {
+		selection += "c"
 	}
-	if random {
-		set++
+	if *random {
+		selection += "r"
 	}
-	if set == 0 {
-		fmt.Fprintln(os.Stderr, "Please select 1 flag")
+
+	switch selection {
+	case "s":
+		fmt.Println("search Term")
+	case "k":
+		fmt.Println("Category Search")
+	case "c":
+		fmt.Println("List categories")
+	case "r":
+		fmt.Println("random")
+	default:
+		if len(selection) == 0 {
+			fmt.Fprintln(os.Stderr, "Error: A flag must be selected")
+		} else {
+			fmt.Fprintln(os.Stderr, "Error: Please select only 1 flag")
+		}
 		flag.Usage()
-		os.Exit(2)
-	}
-	if set != 1 {
-		fmt.Fprintln(os.Stderr, "Error: Only Select 1 flag.")
 		os.Exit(2)
 	}
 }
