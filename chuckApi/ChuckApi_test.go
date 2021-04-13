@@ -9,10 +9,12 @@ func TestRandomFact(t *testing.T) {
 	result1, err1 := RandomFact()
 	if err1 != nil {
 		t.Errorf("Error during call1 (%v)", err1)
+		return // could not get Random Fact
 	}
 	result2, err2 := RandomFact()
 	if err2 != nil {
 		t.Errorf("Error during call2 (%v)", err2)
+		return // could not get Random Fact
 	}
 	if !result1.Valid() || !result2.Valid() {
 		t.Error("result1 or result 2 are not valid")
@@ -26,10 +28,12 @@ func TestCategoriesList(t *testing.T) {
 	result1, err1 := CategoriesList()
 	if err1 != nil {
 		t.Errorf("Error during call1 (%v)", err1)
+		return // cloud not get list
 	}
 	result2, err2 := CategoriesList()
 	if err2 != nil {
 		t.Errorf("Error during call2 (%v)", err2)
+		return // could not get list
 	}
 
 	if len(result1) != len(result2) {

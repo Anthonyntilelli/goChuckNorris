@@ -9,13 +9,6 @@ import (
 )
 
 func main() {
-	// fact, err := chuckApi.RandomFact()
-	// if err != nil {
-	// 	fmt.Println("ERROR")
-	// 	fmt.Println(err)
-	// } else {
-	// 	fmt.Println(fact)
-	// }
 	var selection string
 
 	searchTerm := flag.String("s", "", "Get a fact based on search Term [choose only one flag]")
@@ -43,13 +36,6 @@ func main() {
 		outputFact(fact, err)
 	case "k":
 		fact, err := chuckApi.RandomFactByCategory(*category)
-		if err != nil {
-			// Replace error if catigory is invalid
-			valid, vErr := validCategory(*category)
-			if !valid && vErr == nil {
-				err = fmt.Errorf(*category + " is not a valid category")
-			}
-		}
 		outputFact(fact, err)
 	case "c":
 		categories, err := chuckApi.CategoriesList()
@@ -77,29 +63,10 @@ func main() {
 
 func outputFact(fact chuckApi.ChuckFact, err error) {
 	if err != nil {
-		emergenyExit(err)
+		fmt.Fprintln(os.Stderr, "ERROR:", err)
+		fmt.Println("Emergeny Fact: " + chuckApi.EmergencyFact().Value)
+		os.Exit(3)
 	} else {
 		fmt.Println(fact.Value)
 	}
-}
-
-func emergenyExit(err error) {
-	fmt.Fprintln(os.Stderr, "ERROR: ", err)
-	fmt.Println("Emergeny Fact: " + chuckApi.EmergencyFact().Value)
-	os.Exit(3)
-}
-
-// Use original error if validCategory returns error
-func validCategory(input string) (bool, error) {
-	// check for valid category
-	list, err := chuckApi.CategoriesList()
-	if err != nil {
-		return false, err
-	}
-	for _, v := range list {
-		if v == input {
-			return true, nil
-		}
-	}
-	return false, nil
 }
