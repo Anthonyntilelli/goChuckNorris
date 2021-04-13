@@ -41,7 +41,7 @@ const factURL string = "https://api.chucknorris.io/"
 
 func RandomFact() (ChuckFact, error) {
 	var fact ChuckFact
-	responce, err := getAPI(factURL + "/jokes/random")
+	responce, _, err := getAPI(factURL + "/jokes/random")
 	if err != nil {
 		return fact, err
 	}
@@ -51,7 +51,7 @@ func RandomFact() (ChuckFact, error) {
 }
 
 func CategoriesList() ([]string, error) {
-	responceList, err := getAPI(factURL + "jokes/categories")
+	responceList, _, err := getAPI(factURL + "jokes/categories")
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +63,11 @@ func CategoriesList() ([]string, error) {
 // RandomFactByCategory does not check locally, relies on api for errors
 func RandomFactByCategory(category string) (ChuckFact, error) {
 	var fact ChuckFact
-	responce, err := getAPI(factURL + "/jokes/random?category=" + category)
+	responce, StatusCode, err := getAPI(factURL + "/jokes/random?category=" + category)
 	if err != nil {
+		if StatusCode == 404 {
+			err = fmt.Errorf("Provided category (" + category + ") is not valid.")
+		}
 		return fact, err
 	}
 
@@ -83,7 +86,7 @@ func RandomFactbytext(searhTerm string) (ChuckFact, error) {
 		return fact, fmt.Errorf("search term must be one word")
 	}
 
-	responce, err := getAPI(factURL + "jokes/search?query=" + searhTerm)
+	responce, _, err := getAPI(factURL + "jokes/search?query=" + searhTerm)
 	if err != nil {
 		return fact, err
 	}
@@ -128,18 +131,18 @@ func (c ChuckFact) Valid() bool {
 	return c.Id != "" && c.Value != ""
 }
 
-func getAPI(fullUrl string) ([]byte, error) {
+func getAPI(fullUrl string) ([]byte, int, error) {
 	resp, err := http.Get(fullUrl)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if (err == nil) && (resp.StatusCode != http.StatusOK) {
-		return nil, fmt.Errorf("Return status code is: " + strconv.Itoa(resp.StatusCode))
+		return nil, resp.StatusCode, fmt.Errorf("Return status code is: " + strconv.Itoa(resp.StatusCode))
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, resp.StatusCode, err
 	}
-	return body, nil
+	return body, resp.StatusCode, nil
 }
